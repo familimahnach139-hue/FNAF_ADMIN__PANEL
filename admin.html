@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FNaF - Админ-панель</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Стили для листания админ-панели */
+        .admin-wrapper {
+            min-height: 100vh;
+            background: #000;
+            padding: 20px;
+        }
+        
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .admin-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #0f0;
+            position: sticky;
+            top: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .admin-header h1 {
+            color: #ff0000;
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px #ff0000;
+        }
+        
+        .admin-scrollable {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            margin: -20px;
+        }
+        
+        .connection-panel {
+            background: #111;
+            border: 3px solid #0f0;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+        }
+        
+        .connection-form {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            align-items: center;
+        }
+        
+        .connection-input {
+            flex: 1;
+            padding: 15px;
+            background: #222;
+            border: 3px solid #0f0;
+            color: #0f0;
+            font-family: monospace;
+            font-size: 1.1rem;
+            border-radius: 8px;
+        }
+        
+        .connection-btn {
+            padding: 15px 30px;
+            background: #0a0;
+            border: 3px solid #0f0;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .connection-btn:hover {
+            background: #0f0;
+            box-shadow: 0 0 20px #0f0;
+        }
+        
+        .connection-status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .status-connected {
+            background: #0a0;
+            color: #000;
+            border: 2px solid #0f0;
+        }
+        
+        .status-disconnected {
+            background: #300;
+            color: #ff0000;
+            border: 2px solid #ff0000;
+        }
+        
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .control-panel {
+            background: #111;
+            border: 3px solid #0f0;
+            padding: 25px;
+            border-radius: 15px;
+            height: fit-content;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);
+        }
+        
+        .panel-title {
+            color: #0af;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #0af;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-label {
+            color: #0f0;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .control-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .btn-admin {
+            padding: 12px 20px;
+            background: #222;
+            border: 2px solid #0f0;
+            color: #0f0;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .btn-admin:hover:not(:disabled) {
+            background: #0f0;
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+        }
+        
+        .btn-admin:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .btn-admin.danger {
+            border-color: #ff0000;
+            color: #ff0000;
+        }
+        
+        .btn-admin.danger:hover:not(:disabled) {
+            background: #ff0000;
+            color: #000;
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+        }
+        
+        .btn-admin.warning {
+            border-color: #ff9900;
+            color: #ff9900;
+        }
+        
+        .btn-admin.warning:hover:not(:disabled) {
+            background: #ff9900;
+            color: #000;
+            box-shadow: 0 5px 15px rgba(255, 153, 0, 0.3);
+        }
+        
+        .btn-admin.success {
+            border-color: #0f0;
+            color: #0f0;
+        }
+        
+        .btn-admin.success:hover:not(:disabled) {
+            background: #0f0;
+            color: #000;
+        }
+        
+        .camera-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .camera-card {
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #333;
+            transition: all 0.3s;
+        }
+        
+        .camera-card:hover {
+            border-color: #0f0;
+            transform: translateY(-5px);
+        }
+        
+        .camera-card.broken {
+            border-color: #ff0000;
+            background: #300;
+        }
+        
+        .camera-card.repairing {
+            border-color: #ff9900;
+            background: #330;
+            animation: pulse-border 1s infinite;
+        }
+        
+        @keyframes pulse-border {
+            0%, 100% { border-color: #ff9900; }
+            50% { border-color: #ffcc00; }
+        }
+        
+        .camera-title {
+            color: #0f0;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .camera-status {
+            margin: 10px 0;
+            font-size: 1.1rem;
+            padding: 8px 12px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        
+        .status-online {
+            background: #0a0;
+            color: #000;
+        }
+        
+        .status-offline {
+            background: #300;
+            color: #ff0000;
+        }
+        
+        .status-repairing {
+            background: #330;
+            color: #ff9900;
+        }
+        
+        .energy-control-panel {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #0f0;
+        }
+        
+        .energy-value {
+            font-size: 2rem;
+            color: #0f0;
+            font-weight: bold;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .energy-slider {
+            flex: 1;
+            height: 25px;
+            -webkit-appearance: none;
+            background: #111;
+            outline: none;
+            border: 2px solid #0f0;
+            border-radius: 12px;
+        }
+        
+        .energy-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 30px;
+            height: 30px;
+            background: #0f0;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid #000;
+        }
+        
+        .indicator-control-panel {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #0f0;
+        }
+        
+        .indicator-visual {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            opacity: 0.3;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .indicator-visual.active {
+            opacity: 1;
+            box-shadow: 0 0 20px currentColor;
+            transform: scale(1.1);
+        }
+        
+        .indicator-visual.green { background: #0f0; }
+        .indicator-visual.orange { background: #f90; }
+        .indicator-visual.red { background: #f00; }
+        
+        .indicator-text {
+            min-width: 80px;
+            color: #0f0;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .restart-request-panel {
+            background: #300;
+            border: 3px solid #ff9900;
+            padding: 25px;
+            margin-top: 20px;
+            border-radius: 10px;
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 153, 0, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(255, 153, 0, 0.6); }
+        }
+        
+        .request-title {
+            color: #ff9900;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        
+        .camera-links-panel {
+            background: #111;
+            border: 3px solid #0af;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .camera-link-item {
+            background: #222;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border: 2px solid #333;
+            font-family: monospace;
+        }
+        
+        .link-label {
+            color: #0af;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .link-value {
+            color: #0f0;
+            word-break: break-all;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #111;
+            border: 1px solid #0f0;
+            border-radius: 5px;
+        }
+        
+        .link-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .link-btn {
+            padding: 8px 15px;
+            background: #333;
+            border: 1px solid #0af;
+            color: #0af;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .link-btn:hover {
+            background: #0af;
+            color: #000;
+        }
+        
+        .victory-section {
+            background: linear-gradient(45deg, #0a0, #0f0);
+            border: 4px solid #ff9900;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 40px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 153, 0, 0.4);
+        }
+        
+        .victory-title {
+            color: #000;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .victory-btn {
+            padding: 15px 40px;
+            background: #000;
+            border: 3px solid #ff9900;
+            color: #ff9900;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .victory-btn:hover {
+            background: #ff9900;
+            color: #000;
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 153, 0, 0.8);
+        }
+        
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #0f0;
+            color: #000;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 0 0 20px #0f0;
+        }
+        
+        .back-to-top:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        /* Победа анимация */
+        .victory-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .victory-animation.active {
+            display: flex;
+        }
+        
+        .victory-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .victory-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            text-align: center;
+        }
+        
+        .victory-text {
+            font-size: 5rem;
+            color: #ff9900;
+            margin-bottom: 30px;
+            text-shadow: 0 0 30px #ff9900;
+            animation: victory-pulse 2s infinite;
+        }
+        
+        @keyframes victory-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+        
+        .game-title-large {
+            font-size: 4rem;
+            color: #ff0000;
+            text-shadow: 0 0 30px #ff0000;
+            animation: title-glow 3s infinite;
+        }
+        
+        @keyframes title-glow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .camera-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .connection-form {
+                flex-direction: column;
+            }
+            
+            .control-row {
+                flex-direction: column;
+            }
+            
+            .admin-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1><i class="fas fa-user-shield"></i> АДМИН-ПАНЕЛЬ FNAF</h1>
+                <p>Полное управление игрой в реальном времени</p>
+            </div>
+            
+            <div class="admin-scrollable">
+                <!-- Подключение -->
+                <div class="connection-panel">
+                    <h2 class="panel-title"><i class="fas fa-plug"></i> Подключение к игре</h2>
+                    <p style="color:#0f0; margin-bottom:15px;">Скопируйте ссылку с главной страницы и вставьте ниже:</p>
+                    <div class="connection-form">
+                        <input type="text" id="gameLink" class="connection-input" placeholder="Вставьте ссылку с главной страницы">
+                        <button id="connectBtn" class="connection-btn">
+                            <i class="fas fa-link"></i> ПОДКЛЮЧИТЬСЯ
+                        </button>
+                    </div>
+                    <div id="connectionStatus" class="connection-status"></div>
+                </div>
+                
+                <div class="admin-grid">
+                    <!-- Управление игрой -->
+                    <div class="control-panel">
+                        <h2 class="panel-title"><i class="fas fa-gamepad"></i> Управление игрой</h2>
+                        
+                        <div class="control-group">
+                            <div class="control-label">Экран ожидания:</div>
+                            <div class="control-row">
+                                <button class="btn-admin success" id="enableWaiting">
+                                    <i class="fas fa-play"></i> Включить
+                                </button>
+                                <button class="btn-admin danger" id="disableWaiting">
+                                    <i class="fas fa-stop"></i> Выключить
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-label">Энергия игрока:</div>
+                            <div class="energy-control-panel">
+                                <div class="energy-value" id="currentEnergy">100%</div>
+                                <input type="range" class="energy-slider" id="energySlider" min="0" max="100" value="100">
+                                <button class="btn-admin" id="decreaseEnergy">
+                                    <i class="fas fa-bolt"></i> -1%
+                                </button>
+                            </div>
+                            <p style="color:#666; margin-top:10px; font-size:0.9rem;">Энергия уменьшается только при нажатии кнопки</p>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-label">Время в игре:</div>
+                            <div class="control-row">
+                                <select class="connection-input" id="timeSelect" style="flex:1;">
+                                    <option value="12:00 AM">12:00 AM</option>
+                                    <option value="1:00 AM">1:00 AM</option>
+                                    <option value="2:00 AM">2:00 AM</option>
+                                    <option value="3:00 AM">3:00 AM</option>
+                                    <option value="4:00 AM">4:00 AM</option>
+                                    <option value="5:00 AM">5:00 AM</option>
+                                    <option value="6:00 AM">6:00 AM</option>
+                                </select>
+                                <button class="btn-admin" id="setTime">
+                                    <i class="fas fa-clock"></i> Установить
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-label">Экстренные действия:</div>
+                            <div class="control-row">
+                                <button class="btn-admin danger" id="triggerGameOver">
+                                    <i class="fas fa-skull"></i> GAME OVER
+                                </button>
+                                <button class="btn-admin warning" id="resetGame">
+                                    <i class="fas fa-redo"></i> Сбросить игру
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Индикаторы -->
+                    <div class="control-panel">
+                        <h2 class="panel-title"><i class="fas fa-lightbulb"></i> Индикаторы на главной странице</h2>
+                        <p style="color:#0f0; margin-bottom:20px;">Оранжевый индикатор автоматически включается при открытии камер</p>
+                        
+                        <div class="control-group">
+                            <div class="control-label">Зеленый индикатор:</div>
+                            <div class="indicator-control-panel">
+                                <div class="indicator-visual green" id="greenIndicatorStatus"></div>
+                                <span class="indicator-text" id="greenIndicatorText">Выкл</span>
+                                <button class="btn-admin" id="toggleGreen">
+                                    <i class="fas fa-power-off"></i> Переключить
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-label">Оранжевый индикатор:</div>
+                            <div class="indicator-control-panel">
+                                <div class="indicator-visual orange" id="orangeIndicatorStatus"></div>
+                                <span class="indicator-text" id="orangeIndicatorText">Выкл</span>
+                                <button class="btn-admin" id="toggleOrange">
+                                    <i class="fas fa-power-off"></i> Переключить
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-label">Красный индикатор:</div>
+                            <div class="indicator-control-panel">
+                                <div class="indicator-visual red" id="redIndicatorStatus"></div>
+                                <span class="indicator-text" id="redIndicatorText">Выкл</span>
+                                <button class="btn-admin" id="toggleRed">
+                                    <i class="fas fa-power-off"></i> Переключить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Управление видеовызовами -->
+                    <div class="control-panel">
+                        <h2 class="panel-title"><i class="fas fa-phone"></i> Управление видеовызовами</h2>
+                        
+                        <div class="camera-grid" id="cameraControls">
+                            <!-- Видеовызовы будут добавлены динамически -->
+                        </div>
+                        
+                        <div class="control-group" style="margin-top:20px;">
+                            <div class="control-label">Групповые действия:</div>
+                            <div class="control-row">
+                                <button class="btn-admin danger" id="breakAllCameras">
+                                    <i class="fas fa-ban"></i> Разорвать все
+                                </button>
+                                <button class="btn-admin success" id="repairAllCameras">
+                                    <i class="fas fa-tools"></i> Восстановить все
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Системные функции -->
+                    <div class="control-panel">
+                        <h2 class="panel-title"><i class="fas fa-cogs"></i> Системные функции</h2>
+                        
+                        <div class="control-group">
+                            <div class="control-label">Системная ошибка (отключение электричества):</div>
+                            <div class="control-row">
+                                <button class="btn-admin danger" id="triggerSystemError">
+                                    <i class="fas fa-power-off"></i> Отключить электричество
+                                </button>
+                                <button class="btn-admin success" id="fixSystemError" disabled>
+                                    <i class="fas fa-bolt"></i> Включить электричество
+                                </button>
+                            </div>
+                            <p style="color:#666; margin-top:10px; font-size:0.9rem;">Игрок сможет запросить перезапуск системы</p>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-label">Запросы на перезапуск системы:</div>
+                            <div id="restartRequests">
+                                <!-- Запросы будут добавлены динамически -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Управление ссылками камер/устройств -->
+                <div class="control-panel">
+                    <h2 class="panel-title"><i class="fas fa-link"></i> Ссылки для подключения камер</h2>
+                    
+                    <div class="control-group">
+                        <div class="control-label">Как это работает:</div>
+                        <div style="background:#1a1a1a; border:2px solid #0af; padding:15px; border-radius:8px; color:#0af; line-height:1.8;">
+                            <p><strong>1.</strong> Нажмите кнопку "Сгенерировать 4 ссылки"</p>
+                            <p><strong>2.</strong> Скопируйте ссылки с помощью кнопки "Копировать"</p>
+                            <p><strong>3.</strong> Откройте ссылки на мобильных устройствах (телефон, планшет)</p>
+                            <p><strong>4.</strong> Нажмите "ВКЛЮЧИТЬ" на каждом устройстве</p>
+                            <p><strong>5.</strong> Камеры будут появляться в главной игре</p>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group" style="margin-top:20px;">
+                        <div class="control-label">Действия:</div>
+                        <div class="control-row">
+                            <button class="btn-admin success" id="generateLinks" style="flex:1;">
+                                <i class="fas fa-qrcode"></i> Сгенерировать 4 ссылки
+                            </button>
+                            <button class="btn-admin" id="copyAllLinks" style="flex:1;">
+                                <i class="fas fa-copy"></i> Копировать все
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group" style="margin-top:20px;">
+                        <div class="control-label">Ссылки для камер:</div>
+                        <div id="cameraLinks" style="display:flex; flex-direction:column; gap:20px;">
+                            <div style="color:#666; text-align:center; padding:20px; background:#1a1a1a; border:1px dashed #666; border-radius:8px;">
+                                Ссылки не сгенерированы. Нажмите "Сгенерировать 4 ссылки"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Информация о видеовызовах -->
+                <div class="camera-links-panel">
+                    <h2 class="panel-title"><i class="fas fa-phone"></i> Управление видеовызовами</h2>
+                    
+                    <div class="control-group">
+                        <div class="control-label">Информация:</div>
+                        <div style="background:#1a1a1a; border:2px solid #0af; padding:15px; border-radius:8px; color:#0af; line-height:1.8;">
+                            <p><strong>• Видеовызовы настраиваются игроком на главном экране</strong></p>
+                            <p><strong>• Каждый вызов может быть сломан и восстановлен</strong></p>
+                            <p><strong>• Поддерживаемые сервисы:</strong> Telegram, Viber, Google Meet, WhatsApp</p>
+                            <p><strong>• Используйте кнопки выше для управления состоянием вызовов</strong></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Победа -->
+                <div class="victory-section">
+                    <div class="victory-title">
+                        <i class="fas fa-trophy"></i> СИСТЕМА ПОБЕДЫ
+                    </div>
+                    <p style="color:#000; margin-bottom:20px; font-size:1.2rem;">Активируйте победу, чтобы завершить игру с красивой анимацией</p>
+                    <button class="victory-btn" id="triggerVictory">
+                        <i class="fas fa-crown"></i> АКТИВИРОВАТЬ ПОБЕДУ
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'});">
+            <i class="fas fa-arrow-up"></i>
+        </div>
+    </div>
+    
+    <!-- Анимация победы -->
+    <div class="victory-animation" id="victoryAnimation">
+        <div class="victory-overlay">
+            <h1 class="victory-text">ПОБЕДА!</h1>
+            <p style="font-size:2.5rem; margin-bottom:30px;">Вы пережили ночную смену!</p>
+            <h2 class="game-title-large">FIVE NIGHTS AT FREDDY'S</h2>
+            <button onclick="document.getElementById('victoryAnimation').classList.remove('active');" 
+                    style="margin-top:30px; padding:15px 30px; background:#0f0; border:3px solid #000; color:#000; font-size:1.2rem; cursor:pointer;">
+                ЗАКРЫТЬ
+            </button>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
